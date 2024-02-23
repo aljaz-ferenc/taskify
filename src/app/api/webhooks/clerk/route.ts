@@ -4,7 +4,7 @@ import { WebhookEvent } from '@clerk/nextjs/server'
 import * as actions from '@/actions'
  
 export async function POST(req: Request) {
- console.log('haha')
+ console.log('webhook request')
  
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET
