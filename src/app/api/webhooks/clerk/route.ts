@@ -69,7 +69,7 @@ if(eventType === 'user.created'){
 		lastName: last_name,
 		image: image_url
 	}
-
+  console.log('user from route: ', user)
 	await actions.createUser(user)	
 }
 

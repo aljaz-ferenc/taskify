@@ -11,12 +11,15 @@ interface User{
 }
 
 export async function createUser(user: User){
+    console.log('user from createUser action', user)
     try{
         await connectToDB()
         const newUser = await User.create(user, {new: true})
         console.log('User created: ', newUser)
     }catch(err: unknown){
-        throw err
+        if(err instanceof Error){
+            console.log(err.message)
+        }
     }
 }
 
