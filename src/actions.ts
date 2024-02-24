@@ -1,3 +1,5 @@
+'use server'
+
 import { connectToDB } from "./database"
 import User from "./database/models/User"
 
