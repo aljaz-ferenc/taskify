@@ -1,12 +1,25 @@
+"use client";
+
 import { GrAdd } from "react-icons/gr";
 import Task from "@/components/Task";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ITask } from "@/types";
-import React from "react";
+import React, { useState } from "react";
 import TaskContainer from "@/components/TaskContainer";
+import AddTaskModal from "@/components/AddTaskModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-export default function Tasks() {
+export default function TasksPage() {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
   const tasks: ITask[] = [
     {
       title: "Project Proposal",
@@ -73,16 +86,13 @@ export default function Tasks() {
       <div className="flex gap-3 items-center p-3 bg-white">
         <h1 className="text-2xl">Task List</h1>
         <Input placeholder="Search tasks..." className="w-[20rem] ml-auto" />
-        <Button className="text-black custom-gradient">
-          <GrAdd className="mr-2" />
-          Add New Task
-        </Button>
+        <AddTaskModal setModalIsOpen={setModalIsOpen}/>
       </div>
       <div className="w-full flex justify-evenly">
         {taskContainers.map((container) => (
           <>
-          <TaskContainer title={container.title} tasks={container.tasks} />
-          <div className="w-[1px] h-screen bg-gray-200"></div>
+            <TaskContainer title={container.title} tasks={container.tasks} />
+            <div className="w-[1px] h-screen bg-gray-200"></div>
           </>
         ))}
       </div>
