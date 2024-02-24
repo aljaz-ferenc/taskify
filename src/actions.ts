@@ -1,7 +1,7 @@
 'use server'
 
 import { connectToDB } from "./database"
-import User from "./database/models/User"
+import User, { IUser } from "./database/models/User"
 
 interface User{
     clerkId?: string
@@ -16,8 +16,8 @@ export async function createUser(user: User){
     console.log('user from createUser action', user)
     try{
         await connectToDB()
-        const newUser = await User.create(user, {new: true})
-        console.log('User created: ', newUser)
+        const newUser = await User.create(user)
+        return JSON.parse(JSON.stringify(newUser))
     }catch(err: unknown){
         if(err instanceof Error){
             console.log(err.message)
