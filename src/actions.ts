@@ -1,5 +1,6 @@
 'use server'
 
+import { ObjectId } from "mongodb"
 import { connectToDB } from "./database"
 import User, { IUser } from "./database/models/User"
 
@@ -13,7 +14,6 @@ interface User{
 }
 
 export async function createUser(user: User){
-    console.log('user from createUser action', user)
     try{
         await connectToDB()
         const newUser = await User.create(user)
@@ -31,18 +31,22 @@ export async function updateUser(id: string, user: User){
         const updatedUser = await User.findByIdAndUpdate(id, {new: true})
         console.log('User updated: ', updatedUser)
     }catch(err: unknown){
-        throw err
+        if(err instanceof Error){
+            console.log(err.message)
+        }
     }
 }
 
-export async function deleteUser(id: string | undefined){
+export async function deleteUser(clerkId: string | undefined){
     try{
-        if(id){
+        if(clerkId){
             await connectToDB()
-            const deletedUser = User.findByIdAndDelete(id)
+            const deletedUser = await User.deleteOne({clerkId})
             console.log('User deleted: ', deletedUser)
         }
     }catch(err: unknown){
-        throw err
+        if(err instanceof Error){
+            console.log(err.message)
+        }
     }
 }
