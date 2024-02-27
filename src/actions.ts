@@ -3,6 +3,8 @@
 import { ObjectId } from "mongodb"
 import { connectToDB } from "./database"
 import User, { IUser } from "./database/models/User"
+import { ITask } from "./types"
+import Task from "./database/models/Task"
 
 interface User{
     clerkId?: string
@@ -44,6 +46,18 @@ export async function deleteUser(clerkId: string | undefined){
             const deletedUser = await User.deleteOne({clerkId})
             console.log('User deleted: ', deletedUser)
         }
+    }catch(err: unknown){
+        if(err instanceof Error){
+            console.log(err.message)
+        }
+    }
+}
+
+export async function createTask(task: ITask){
+    try{
+        await connectToDB()
+        const newTask = await Task.create(task)
+        console.log('new task created: ', newTask)
     }catch(err: unknown){
         if(err instanceof Error){
             console.log(err.message)

@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { IUser } from "./User";
 
 export interface ITask {
-    assignedTo: IUser,
+    assignedTo: string[],
     title: string,
     description: string,
     status: 'pending' | 'in-progress' | 'in-review' | 'done',
@@ -12,7 +12,7 @@ export interface ITask {
 
 const taskSchema = new mongoose.Schema({
     assignedTo: {
-        type: Schema.Types.ObjectId,
+        type: [String],
         ref: 'User'
     },
     title: {
@@ -24,11 +24,13 @@ const taskSchema = new mongoose.Schema({
         required: [true, 'description required']
     },
     status: {
+        type: String,
         enum: ['pending', 'in-progress', 'in-review', 'done'],
         required: [true, 'status required'],
         default: 'pending'
     },
     priority: {
+        type: String,
         enum: ['urgent', 'high', 'medium', 'low'],
         required: [true, 'priority required']
     },
@@ -37,3 +39,6 @@ const taskSchema = new mongoose.Schema({
         required: [true, 'deadline required']
     }
 })
+
+const Task = mongoose.models.Task || mongoose.model('Task', taskSchema)
+export default Task

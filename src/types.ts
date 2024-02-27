@@ -3,5 +3,6 @@ export interface ITask {
     description: string,
     deadline: Date,
     priority: 'urgent' | 'high' | 'medium' | 'low',
-    status: 'to-do' | 'in-progress' | 'in-review' | 'done'
+    status: 'pending' | 'in-progress' | 'in-review' | 'done',
+    assignedTo: string[]
 }

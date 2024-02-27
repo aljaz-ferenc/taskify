@@ -1,6 +1,6 @@
 "use client";
 
-import React, { SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,12 +25,13 @@ import {
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Command, CommandGroup, CommandInput, CommandItem } from "./ui/command";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "./ui/calendar";
+import { ITask } from "@/database/models/Task";
+import * as actions from '@/actions'
 
 type AddTaskModalProps = {
   setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -107,9 +108,40 @@ type Worker = {
 
 export default function AddTaskModal({ setModalIsOpen }: AddTaskModalProps) {
   const [selectWorkersIsOpen, setSelectWorkersIsOpen] = useState(false);
-  const [selectedWorkersIds, setSelectedWorkersIds] = useState<string>("");
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const formSchema = z.object({});
+  const [selectedWorkersIds, setSelectedWorkersIds] = useState<string[]>([]);
+  const [date, setDate] = useState<string>('');
+  const [errors, setErrors] = useState<any>({})
+  
+
+  function handleSubmit(formData: any){
+
+    const task: ITask = {
+      title: formData.get('title'),
+      deadline: new Date(formData.get('deadline')),
+      status: 'pending',
+      priority: formData.get('priority'),
+      description: formData.get('description'),
+      assignedTo: selectedWorkersIds
+    }
+
+    const formSchema = z.object({
+      title: z.string().min(3, {message: 'Title must be at least 3 characters long'}),
+      deadline: z.date(),
+      status: z.string(),
+      priority: z.enum(['urgent', 'high', 'medium', 'low']),
+      assignedTo: z.string().array().min(1, {message: 'Select at least one person for the task'})
+    });
+
+    const result: any = formSchema.safeParse(task)
+    console.log(result)
+    if(result.error){
+      setErrors(result.error.flatten().fieldErrors)
+      console.log(result.error.flatten().fieldErrors)
+    }
+    if(result.success === true){
+      actions.createTask(task)
+    }
+  }
 
   return (
     <Dialog>
@@ -129,14 +161,19 @@ export default function AddTaskModal({ setModalIsOpen }: AddTaskModalProps) {
             Assign a task to one or more workers.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="title">Title</Label>
-          <Input id="title" type="text" />
-        </div>
-
-        <div className="flex flex-col gap-2">
+        <form action={handleSubmit}>
+          <div>
+          <Label>Title</Label>
+          <Input type="text" name="title" />
+          {errors.title && <div>{errors.title}</div>}
+          </div>
+          {/* <div>
+          <Label>Deadline</Label>
+          <Input type="date" name="deadline"/>
+          </div> */}
+          <div className="flex flex-col gap-2">
           <Label className="m-0 p-0">Priority</Label>
-          <Select>
+          <Select name="priority">
             <SelectTrigger>
               <SelectValue placeholder="Select priority..." />
             </SelectTrigger>
@@ -149,9 +186,12 @@ export default function AddTaskModal({ setModalIsOpen }: AddTaskModalProps) {
               </SelectGroup>
             </SelectContent>
           </Select>
+          {errors.priority && <div>Select a priority</div>}
         </div>
         <div className="flex flex-col gap-2">
+
           <Label className="m-0 p-0">Deadline</Label>
+          {/* <Input type="date" name="deadline" hidden value={date}/> */}
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -168,8 +208,8 @@ export default function AddTaskModal({ setModalIsOpen }: AddTaskModalProps) {
             <PopoverContent className="w-auto p-0">
             <Calendar
           mode="single"
-          selected={date}
-          onSelect={(date) => setDate(date)}
+          selected={new Date(date) || new Date()}
+          onSelect={(date) => date && setDate(date?.toString())}
           initialFocus
         />
             </PopoverContent>
@@ -178,23 +218,24 @@ export default function AddTaskModal({ setModalIsOpen }: AddTaskModalProps) {
         <div className="flex flex-col gap-2">
           <Label className="m-0 p-0">Workers</Label>
           <ToggleGroup
-            onValueChange={(value) => setSelectedWorkersIds(value.toString())}
+            onValueChange={(value) => setSelectedWorkersIds(value)}
             type="multiple"
             className="grid grid-cols-3"
           >
             {workers.map((worker) => (
-              <ToggleGroupItem value={String(worker.id)}>
+              <ToggleGroupItem key={worker.id} value={String(worker.id)}>
                 {worker.firstName} {worker.lastName}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+          {errors.assignedTo && <div>{errors.assignedTo}</div>}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="description">Description</Label>
-          <Textarea id="description" />
+          <Textarea id="description" name='description'/>
         </div>
+        </form>
         <DialogFooter>
-          <Button>Add Task</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

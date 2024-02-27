@@ -1,8 +1,6 @@
 "use client";
 
-import { GrAdd } from "react-icons/gr";
-import Task from "@/components/Task";
-import { Button } from "@/components/ui/button";
+
 import { Input } from "@/components/ui/input";
 import { ITask } from "@/types";
 import React, { useState } from "react";
@@ -27,7 +25,8 @@ export default function TasksPage() {
         "Prepare a detailed project proposal outlining goals, scope, and deliverables.",
       deadline: new Date("2024-03-15"),
       priority: "high",
-      status: "to-do",
+      status: "pending",
+      assignedTo:['1', '2', '3']
     },
     {
       title: "Market Research",
@@ -36,13 +35,15 @@ export default function TasksPage() {
       deadline: new Date("2024-03-10"),
       priority: "medium",
       status: "in-progress",
+      assignedTo:['1', '2', '3']
     },
     {
       title: "Budget Analysis",
       description: "Review and analyze the budget for the upcoming quarter.",
       deadline: new Date("2024-03-20"),
       priority: "high",
-      status: "to-do",
+      status: "pending",
+      assignedTo:['1', '2', '3']
     },
     {
       title: "Client Meeting",
@@ -51,6 +52,7 @@ export default function TasksPage() {
       deadline: new Date("2024-03-12"),
       priority: "urgent",
       status: "done",
+      assignedTo:['1', '2', '3']
     },
     {
       title: "Training Session",
@@ -59,13 +61,14 @@ export default function TasksPage() {
       deadline: new Date("2024-03-08"),
       priority: "low",
       status: "done",
+      assignedTo:['1', '2', '3']
     },
   ];
 
   const taskContainers = [
     {
-      title: "to-do",
-      tasks: tasks.filter((task) => task.status === "to-do"),
+      title: "pending",
+      tasks: tasks.filter((task) => task.status === "pending"),
     },
     {
       title: "in-progress",
@@ -90,10 +93,10 @@ export default function TasksPage() {
       </div>
       <div className="w-full flex justify-evenly">
         {taskContainers.map((container) => (
-          <>
+          <div key={container.title}>
             <TaskContainer title={container.title} tasks={container.tasks} />
             <div className="w-[1px] h-screen bg-gray-200"></div>
-          </>
+          </div>
         ))}
       </div>
     </div>
